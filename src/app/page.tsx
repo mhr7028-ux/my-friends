@@ -5,6 +5,7 @@ import { Person, RelationshipEdge, Memory } from '@/lib/types';
 import { INITIAL_PEOPLE, INITIAL_EDGES, INITIAL_MEMORIES } from '@/lib/mockData';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
+import BottomNav from '@/components/BottomNav';
 import ARCameraModule from '@/components/ARCameraModule';
 import RelationshipGraphModule from '@/components/RelationshipGraphModule';
 import MemoryVaultModule from '@/components/MemoryVaultModule';
@@ -17,6 +18,7 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<string>('gpt-4o');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedPersonId, setSelectedPersonId] = useState<string>('person-1');
+  const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
 
   // Application Data States
   const [people, setPeople] = useState<Person[]>(INITIAL_PEOPLE);
@@ -49,7 +51,6 @@ export default function Home() {
       tags: [newGroup],
     };
 
-    // Auto-connect to User ("나")
     const newEdge: RelationshipEdge = {
       id: `edge-${Date.now()}`,
       sourceId: 'user-0',
@@ -62,7 +63,6 @@ export default function Home() {
     setEdges((prev) => [...prev, newEdge]);
     setSelectedPersonId(newPersonId);
 
-    // Reset Form
     setNewName('');
     setNewTitle('');
     setNewPhone('');
@@ -139,28 +139,34 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-100 font-sans">
-      {/* Sidebar Navigation */}
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-100 font-sans relative">
+      {/* Sidebar Navigation (Desktop & Mobile Drawer) */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         selectedModel={selectedModel}
         setSelectedModel={setSelectedModel}
+        isMobileOpen={isMobileOpen}
+        onCloseMobile={() => setIsMobileOpen(false)}
       />
 
       {/* Main Workspace Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full overflow-hidden pb-16 md:pb-0">
         <Header
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onOpenAddPerson={() => setShowAddPersonModal(true)}
+          onToggleMobileSidebar={() => setIsMobileOpen(true)}
         />
 
         {/* Tab Viewport */}
         <main className="flex-1 overflow-hidden relative">{renderActiveTab()}</main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Add Person Modal */}
       {showAddPersonModal && (

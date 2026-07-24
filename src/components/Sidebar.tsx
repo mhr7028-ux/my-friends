@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, Network, BookOpen, Sparkles, MessageSquare, BrainCircuit, Mic, LogIn, LogOut } from 'lucide-react';
+import { Camera, Network, BookOpen, Sparkles, MessageSquare, BrainCircuit, Mic, LogIn, LogOut, X } from 'lucide-react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 
 interface SidebarProps {
@@ -8,6 +8,8 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export default function Sidebar({
@@ -15,6 +17,8 @@ export default function Sidebar({
   setActiveTab,
   selectedModel,
   setSelectedModel,
+  isMobileOpen = false,
+  onCloseMobile,
 }: SidebarProps) {
   const sessionRes = useSession();
   const session = sessionRes?.data;
@@ -27,22 +31,29 @@ export default function Sidebar({
     { id: 'chat', label: 'AI 추억 소환 대화', icon: MessageSquare },
   ];
 
-  return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col h-full shrink-0 shadow-sm z-20">
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-white border-r border-slate-200 w-64 shrink-0 shadow-sm">
       {/* App Branding */}
-      <div className="p-5 border-b border-slate-100 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 flex items-center justify-center text-white font-black text-xl shadow-md">
-          F
+      <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 flex items-center justify-center text-white font-black text-xl shadow-md">
+            F
+          </div>
+          <div>
+            <h1 className="font-extrabold text-slate-900 text-base leading-tight tracking-tight flex items-center gap-1.5">
+              My Friends
+              <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full font-bold">
+                v1.0
+              </span>
+            </h1>
+            <p className="text-[11px] text-slate-500 font-medium">인맥 & 추억 & 족보 AR 비서</p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-extrabold text-slate-900 text-base leading-tight tracking-tight flex items-center gap-1.5">
-            My Friends
-            <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full font-bold">
-              v1.0
-            </span>
-          </h1>
-          <p className="text-[11px] text-slate-500 font-medium">인맥 & 추억 & 족보 AR 비서</p>
-        </div>
+        {onCloseMobile && (
+          <button onClick={onCloseMobile} className="md:hidden p-1.5 text-slate-400 hover:text-slate-700">
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       {/* Navigation Menu */}
@@ -58,7 +69,10 @@ export default function Sidebar({
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    if (onCloseMobile) onCloseMobile();
+                  }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-xs transition-all duration-200 ${
                     isActive
                       ? 'bg-indigo-50 text-indigo-600 font-bold shadow-xs'
@@ -148,6 +162,21 @@ export default function Sidebar({
           </button>
         )}
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Static Sidebar */}
+      <aside className="hidden md:flex h-full shrink-0 z-20">{sidebarContent}</aside>
+
+      {/* Mobile Drawer Overlay */}
+      {isMobileOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={onCloseMobile} />
+          <div className="relative z-10 h-full">{sidebarContent}</div>
+        </div>
+      )}
+    </>
   );
 }
