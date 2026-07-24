@@ -3,6 +3,8 @@ import { google } from '@ai-sdk/google';
 import { anthropic } from '@ai-sdk/anthropic';
 import { streamText } from 'ai';
 
+export const dynamic = 'force-dynamic';
+
 const systemPrompt = `당신은 'My Friends (마이 프렌즈)' 지능형 인맥 & 추억 & 족보 관리 비서입니다.
 나이가 들면서 희미해질 수 있는 사람들의 이름, 첫 만남의 추억, 일가친척 족보, 나와의 관계 고리를 선명하게 지켜주고 소환해 주는 역할을 합니다.
 친절하고 품격 있는 어조로 답변하며, 필요 시 관상 기반의 유쾌한 아이스브레이킹 대화 팁과 관계도를 브리핑해주세요.`;

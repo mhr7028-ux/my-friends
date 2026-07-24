@@ -1,6 +1,8 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
+export const dynamic = 'force-dynamic';
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -20,7 +22,7 @@ const handler = NextAuth({
   session: {
     strategy: 'jwt',
   },
-  secret: 'my-friends-secret-key-2026',
+  secret: process.env.NEXTAUTH_SECRET || 'my-friends-secret-key-2026',
 });
 
 export { handler as GET, handler as POST };
